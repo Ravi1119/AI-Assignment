@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./ct200.db
+      - MONGODB_URI=mongodb://mongo:27017
+      - MONGODB_DB=ct200_qa
+      - LLM_PROVIDER=${LLM_PROVIDER:-groq}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - LLM_MODEL=${LLM_MODEL:-llama-3.1-8b-instant}
+      - JSON_STORE_PATH=./generated_outputs.json
+    depends_on:
+      - mongo
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
